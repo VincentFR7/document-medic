@@ -26,13 +26,14 @@ header {
   position: relative;
 }
 
-/* Logo flottant et tournant */
+/* Logo flottant et tournant (ajusté) */
 #logo {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 80px;
+  top: 15px;    /* écart du bord supérieur */
+  left: 18px;   /* écart du bord gauche */
+  width: 70px;  /* réduit pour ne pas coller */
   animation: rotateLogoSide 8s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(0,234,255,0.35));
 }
 @keyframes rotateLogoSide {
   0% { transform: rotateY(0deg); }
@@ -60,6 +61,52 @@ header {
 .background img:nth-child(3) { animation-delay: 16s; }
 @keyframes fadeSlideshow {
   0% { opacity: 0; } 10% { opacity: 1; } 30% { opacity: 1; } 40% { opacity: 0; } 100% { opacity: 0; }
+}
+
+/* Horloges de mission (centrées sous le header) */
+.mission-timers {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 16px auto 6px;
+  padding: 0 10px;
+  z-index: 5;
+  position: relative;
+}
+.mission-box {
+  background: rgba(0, 10, 20, 0.6);
+  border: 1px solid rgba(0,234,255,0.18);
+  border-left: 2px solid #00eaff;
+  border-right: 2px solid #00eaff;
+  border-radius: 10px;
+  padding: 10px 18px;
+  width: 220px;
+  box-shadow: 0 0 16px rgba(0,234,255,0.12);
+  text-align: center;
+  backdrop-filter: blur(4px);
+}
+.mission-box h3 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: #9ef2ff;
+  letter-spacing: 1px;
+  text-shadow: 0 0 6px rgba(0,234,255,0.12);
+}
+.countdown {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #dffcff;
+  text-shadow: 0 0 10px rgba(0,170,255,0.15);
+}
+.countdown.active {
+  color: #ff5858;
+  text-shadow: 0 0 12px #ff6464, 0 0 22px #ff2b2b;
+  animation: pulseRed 1s infinite ease-in-out;
+}
+@keyframes pulseRed {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
 
 /* Boutons */
@@ -175,7 +222,7 @@ header {
   position:absolute;
   top:0; left:0;
   width:100%; height:100%;
-  background:rgba(0,255,255,0.1);
+  background:rgba(0,255,255,0.06);
   pointer-events:none;
   z-index:15;
   opacity:0;
@@ -186,6 +233,8 @@ header {
   header { font-size:1.6rem; }
   .button { width:80%; padding:10px; font-size:1rem; }
   .info { width:90%; font-size:1rem; }
+  .mission-timers { flex-direction: column; gap:12px; margin-top:90px; }
+  .mission-box { width: 86%; max-width: 320px; }
 }
 </style>
 </head>
@@ -197,6 +246,7 @@ header {
   <img src="https://i.imgur.com/18aMVXL.jpeg" alt="">
 </div>
 
+<!-- Logo -->
 <img id="logo" src="https://i.imgur.com/o8Z4h35.png" alt="Logo Flotte">
 
 <div id="main">
@@ -206,10 +256,23 @@ header {
     <input type="text" id="searchInput" placeholder="Rechercher un document..." style="padding:8px 10px; border-radius:6px; border:2px solid #00eaff; width:250px; color:#00eaff; background:rgba(0,10,20,0.7);">
   </div>
 
+  <!-- Horloges de mission centrées -->
+  <div class="mission-timers" aria-hidden="false">
+    <div class="mission-box" role="status" aria-live="polite">
+      <h3>Mission 1 – 18h00</h3>
+      <div class="countdown" id="mission18">--:--:--</div>
+    </div>
+    <div class="mission-box" role="status" aria-live="polite">
+      <h3>Mission 2 – 21h00</h3>
+      <div class="countdown" id="mission21">--:--:--</div>
+    </div>
+  </div>
+
   <div id="docButtons">
     <div class="button" data-url="https://google.com/">Fonctionnalité en Jeu</div>
     <div class="button" data-url="https://docs.google.com/spreadsheets/d/18InmloXNjy40ZFQsLcLay0vT1HR999Jjnz8naUmggJw/edit?gid=1198857426#gid=1198857426">Accéder à l'Organigramme</div>
     <div class="button" data-url="https://google.com/">Documents Formation</div>
+    <div class="button" data-url="https://google.com/">Spécialisation</div>
     <div class="button" id="majBtn">Mise à Jour</div>
   </div>
 
@@ -236,6 +299,7 @@ header {
 </div>
 
 <script>
+/* ---------- boutons ouvrant l'iframe ---------- */
 const buttons = document.querySelectorAll('.button[data-url]');
 const viewer = document.getElementById('viewer');
 const docFrame = document.getElementById('docFrame');
@@ -253,8 +317,8 @@ buttons.forEach(btn => {
     viewer.style.display = 'block';
     main.style.display = 'none';
 
-    // Son clic
-    new Audio('https://freesound.org/data/previews/256/256113_3263906-lq.mp3').play();
+    // Son clic (peu intrusif)
+    try { new Audio('https://freesound.org/data/previews/256/256113_3263906-lq.mp3').play(); } catch(e) {}
   });
 });
 
@@ -262,10 +326,10 @@ document.getElementById('backBtn').addEventListener('click', ()=>{
   docFrame.src='';
   viewer.style.display='none';
   main.style.display='block';
-  new Audio('https://freesound.org/data/previews/256/256114_3263906-lq.mp3').play();
+  try { new Audio('https://freesound.org/data/previews/256/256114_3263906-lq.mp3').play(); } catch(e) {}
 });
 
-// Filtre recherche
+/* ---------- Filtre recherche ---------- */
 document.getElementById('searchInput').addEventListener('input', e=>{
   const val = e.target.value.toLowerCase();
   buttons.forEach(btn=>{
@@ -273,7 +337,7 @@ document.getElementById('searchInput').addEventListener('input', e=>{
   });
 });
 
-// Désactivation clic droit et touches dev
+/* ---------- Désactivation clic droit et touches dev ---------- */
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', function(e){
   if(e.key==='F12' || (e.ctrlKey && e.shiftKey && e.key.toUpperCase()==='I') || (e.ctrlKey && e.key.toUpperCase()==='U') || (e.ctrlKey && e.key.toUpperCase()==='S')){
@@ -281,6 +345,68 @@ document.addEventListener('keydown', function(e){
     alert('Accès restreint mon ptit lou ;)');
   }
 });
+
+/* ---------- Horloges de mission (18:00 & 21:00 chaque jour) ---------- */
+function updateCountdown(targetHour, elementId) {
+  const now = new Date();
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), targetHour, 0, 0, 0);
+
+  // si l'heure est déjà passée aujourd'hui → target = lendemain
+  if (now >= target) {
+    target.setDate(target.getDate() + 1);
+  }
+
+  const diff = target - now;
+
+  const hrs = Math.floor((diff / (1000 * 60 * 60)));
+  const mins = Math.floor((diff / (1000 * 60)) % 60);
+  const secs = Math.floor((diff / 1000) % 60);
+
+  const el = document.getElementById(elementId);
+
+  // Si dans la fenêtre d'activation (on considère : à la seconde pile on affiche mission en cours)
+  if (diff <= 0) {
+    el.textContent = "MISSION EN COURS";
+    el.classList.add("active");
+  } else {
+    // Format HH:MM:SS (heures limitées à 2 chiffres pour esthétique)
+    const display = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    el.textContent = display;
+    el.classList.remove("active");
+  }
+}
+
+// Update chaque seconde
+setInterval(() => {
+  updateCountdown(18, "mission18");
+  updateCountdown(21, "mission21");
+}, 1000);
+
+// Init immédiat
+updateCountdown(18, "mission18");
+updateCountdown(21, "mission21");
+
+/* ---------- Option: notification sonore quand mission débute ---------- */
+let lastState18 = null;
+let lastState21 = null;
+function checkAndAlert() {
+  const el18 = document.getElementById('mission18');
+  const el21 = document.getElementById('mission21');
+
+  const state18 = el18.classList.contains('active');
+  const state21 = el21.classList.contains('active');
+
+  // quand passe à "active" on joue un son (une seule fois)
+  if (state18 && !lastState18) {
+    try { new Audio('https://freesound.org/data/previews/401/401999_5121236-lq.mp3').play(); } catch(e) {}
+  }
+  if (state21 && !lastState21) {
+    try { new Audio('https://freesound.org/data/previews/401/401999_5121236-lq.mp3').play(); } catch(e) {}
+  }
+  lastState18 = state18;
+  lastState21 = state21;
+}
+setInterval(checkAndAlert, 1000);
 </script>
 
 </body>
