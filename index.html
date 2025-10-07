@@ -54,7 +54,7 @@ footer { text-align:center; font-size:0.85em; color:rgba(0,234,255,0.5); margin-
   </table>
 
   <div class="assistant" id="assistant">
-    <p class="ai">Assistant : Salut ! Pose-moi une question sur le site, le serveur ou le Datapad.</p>
+    <p class="ai">Assistant : Salut ! Pose-moi une question sur le site, le serveur RP ou le Datapad.</p>
   </div>
   <div class="assistant-input">
     <input type="text" id="userInput" placeholder="Tape ta question...">
@@ -70,7 +70,7 @@ footer { text-align:center; font-size:0.85em; color:rgba(0,234,255,0.5); margin-
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', e => {
   if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key.toUpperCase()))||(e.ctrlKey&&['U','S'].includes(e.key.toUpperCase()))){
-    e.preventDefault(); alert('Accès restreint, soldat ! ⚠️');
+    e.preventDefault(); alert('Accès restreint !');
   }
 });
 
@@ -81,34 +81,38 @@ const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 
 const knowledgeBase = [
-  // Maintenance général
-  {keywords:['quand','accessible','revenir','site'], response:'Le site sera de nouveau accessible dès la fin de la maintenance. Vérifiez régulièrement le tableau ou notre Discord pour plus d’informations.'},
-  {keywords:['serveur','rp','ligne','en ligne'], response:'Le serveur RP est actuellement surveillé. Pour le statut en temps réel, consultez notre Discord ou la liste en jeu.'},
-  {keywords:['raison','maintenance','pourquoi'], response:'La maintenance vise à améliorer la stabilité du serveur et à préparer de nouvelles fonctionnalités RP.'},
-  {keywords:['durée','combien','temps','maintenance'], response:'La durée exacte varie, mais vous pouvez suivre les mises à jour sur le Discord ou le site.'},
-  {keywords:['rejoindre','pendant','maintenance'], response:'Pendant la maintenance, il est recommandé de consulter le Discord. Certains serveurs peuvent rester accessibles, vérifiez la liste GMod en jeu.'},
-  {keywords:['actif','temps réel','en direct'], response:'Vous pouvez vérifier l’activité du serveur en temps réel via le Discord ou directement dans la liste des serveurs GMod.'},
-  {keywords:['fonctionnalité','nouveau','update'], response:'Le site et le serveur recevront de nouvelles fonctionnalités après la maintenance. Plus d’infos sur le Discord.'},
-  // RP Universe
-  {keywords:['contexte','lore','serveur rp'], response:'Le serveur RP se déroule durant la phase II de la guerre des clones (Star Wars). Les joueurs incarnent différentes factions et participent à des missions et événements immersifs.'},
-  {keywords:['faction','équipe','disponible'], response:'Les factions et équipes disponibles sont détaillées sur notre Discord dans les salons d’informations.'},
-  {keywords:['événement','nouveau'], response:'De nouveaux événements RP seront annoncés sur le Discord après la maintenance.'},
-  {keywords:['proposer','idée','rp'], response:'Vous pouvez proposer vos idées RP directement sur le Discord, dans les salons dédiés à la communauté.'},
+  // Maintenance
+  {keywords:['quand','accessible','revenir','site'], response:'Le site sera de nouveau accessible dès la fin de la maintenance planifiée. Consultez notre Discord pour les notifications en temps réel.'},
+  {keywords:['serveur','rp','en ligne','statut'], response:'Le serveur RP est surveillé. Pour savoir s’il est en ligne en temps réel, utilisez la liste des serveurs GMod ou notre Discord officiel.'},
+  {keywords:['raison','maintenance','pourquoi'], response:'La maintenance est effectuée pour améliorer la stabilité, corriger des bugs et préparer de nouvelles fonctionnalités RP.'},
+  {keywords:['durée','temps','combien'], response:'La durée estimée de la maintenance est indiquée dans le tableau. Les mises à jour sont également communiquées sur le Discord.'},
+  {keywords:['rejoindre','pendant'], response:'Pendant la maintenance, l’accès au serveur RP peut être limité. Pour vérifier les serveurs actifs, consultez le Discord ou la liste GMod.'},
+  {keywords:['actif','temps réel','direct'], response:'L’activité en temps réel du serveur peut être suivie via le Discord officiel ou la liste des serveurs GMod.'},
+  {keywords:['fonctionnalité','nouveau','update'], response:'De nouvelles fonctionnalités seront disponibles après la maintenance. Tous les détails seront annoncés sur le Discord et le site.'},
+
+  // Univers RP
+  {keywords:['contexte','lore','serveur rp'], response:'Le serveur RP se déroule dans l’univers de Star Wars, Phase II de la Guerre des Clones. Les joueurs incarnent différentes factions et participent à des missions immersives.'},
+  {keywords:['faction','équipe','disponible'], response:'Les factions et équipes disponibles sont détaillées dans le Discord officiel dans les salons Informations et Règles.'},
+  {keywords:['événement','nouveau'], response:'Les événements RP post-maintenance seront annoncés sur le Discord et dans les salons communautaires.'},
+  {keywords:['proposer','idée','rp'], response:'Vous pouvez proposer des idées RP dans les salons dédiés du Discord pour enrichir les missions et événements.'},
+
   // Technique
-  {keywords:['page','affiche','bug'], response:'Si certaines pages ne s’affichent pas correctement, vérifiez votre navigateur ou réessayez plus tard.'},
-  {keywords:['sauvegarde','sécurisé'], response:'Les sauvegardes des joueurs sont sécurisées et gérées sur notre base de données protégée.'},
-  {keywords:['navigateur','appareil','compatible'], response:'Le site est compatible avec la majorité des navigateurs modernes (Chrome, Edge, Firefox, Safari) et appareils.'},
-  {keywords:['performance','update','serveur'], response:'Des mises à jour des performances du serveur sont prévues après la maintenance pour améliorer la stabilité et la vitesse.'},
+  {keywords:['page','affiche','bug','problème'], response:'Si certaines pages ne s’affichent pas correctement, vérifiez votre navigateur ou essayez de vider le cache. Pour tout problème persistant, signalez-le sur Discord.'},
+  {keywords:['sauvegarde','sécurisé'], response:'Toutes les sauvegardes des joueurs sont sécurisées et protégées dans la base de données du serveur.'},
+  {keywords:['navigateur','appareil','compatible'], response:'Le site fonctionne sur tous les navigateurs modernes (Chrome, Firefox, Edge, Safari) et sur la plupart des appareils mobiles et desktop.'},
+  {keywords:['performance','serveur','update'], response:'Des mises à jour de performance serveur sont prévues pour améliorer la stabilité et la fluidité après la maintenance.'},
+
   // Communauté
-  {keywords:['discord','rejoindre','communauté'], response:'Pour rejoindre la communauté, consultez notre Discord officiel via le site principal.'},
-  {keywords:['admin','contact','contacter'], response:'Les admins peuvent être contactés via le Discord pendant la maintenance.'},
-  {keywords:['règle','regle','serveur'], response:'Toutes les règles du serveur sont disponibles sur le Discord avant de rejoindre le serveur RP.'},
-  {keywords:['classement','statistique','joueur'], response:'Les classements et statistiques sont disponibles sur le Discord.'},
-  {keywords:['problème','bug','signaler'], response:'Pour signaler un problème ou un bug, utilisez le Discord ou le ticket en jeu si disponible.'},
+  {keywords:['discord','rejoindre','communauté'], response:'Pour rejoindre la communauté, utilisez le lien officiel Discord indiqué sur notre site principal. Toutes les infos et règles y sont disponibles.'},
+  {keywords:['admin','contact','contacter'], response:'Pour contacter les admins durant la maintenance, utilisez le Discord officiel dans les salons de support ou via ticket en jeu.'},
+  {keywords:['règle','regle','serveur'], response:'Les règles du serveur sont accessibles dans les salons Discord dédiés avant de rejoindre le serveur RP.'},
+  {keywords:['classement','statistique','joueur'], response:'Les classements et statistiques des joueurs sont consultables sur le Discord officiel.'},
+  {keywords:['signaler','bug','problème'], response:'Pour signaler un bug ou problème, utilisez les salons de support Discord ou le système de ticket intégré au serveur.'},
+
   // IA / support
-  {keywords:['ia','assistant','fonctionne'], response:'L’IA du Datapad répond à vos questions sur le site et le serveur RP en utilisant une base de données locale. Pour des informations plus précises, le Discord reste la référence.'},
-  {keywords:['mission','événement','lore'], response:'Pour poser des questions sur les missions ou le lore, le Discord et les salons RP sont la source officielle.'},
-  {keywords:['événement','prochain','mission'], response:'Pour connaître les événements ou missions à venir, consultez le Discord ou la liste des événements en jeu.'},
+  {keywords:['ia','assistant','fonctionne'], response:'L’IA du Datapad utilise une base de connaissances locale pour répondre aux questions sur le site et le serveur RP. Pour des informations détaillées, consultez le Discord officiel.'},
+  {keywords:['mission','lore','événement'], response:'Pour toute question sur les missions ou le lore, le Discord et les salons RP restent la référence officielle.'},
+  {keywords:['événement','prochain','mission'], response:'Pour les événements ou missions à venir, consultez le Discord ou la liste d’événements en jeu.'},
 ];
 
 function aiResponse(msg){
@@ -119,10 +123,10 @@ function aiResponse(msg){
     }
   }
   const genericResponses = [
-    'Intéressant... Peux-tu reformuler ?',
-    'Je ne suis pas sûr de comprendre, essaie avec d’autres mots.',
-    'Je ne connais pas encore la réponse à cela.',
-    'Essaie une autre question sur le Datapad ou le serveur RP.'
+    'Peux-tu reformuler ta question ?',
+    'Je n’ai pas compris, essaie d’autres mots-clés.',
+    'Je ne connais pas encore la réponse exacte, consulte le Discord pour plus d’infos.',
+    'Essaie une autre question sur le Datapad, le serveur RP ou le Discord.'
   ];
   return genericResponses[Math.floor(Math.random()*genericResponses.length)];
 }
