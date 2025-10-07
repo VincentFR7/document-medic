@@ -1,0 +1,26 @@
+name: Update Data File
+
+on:
+  repository_dispatch:
+    types: [update-data]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Update data.json
+        run: |
+          echo '${{ github.event.client_payload.content }}' > data.json
+          
+      - name: Commit and push changes
+        run: |
+          git config user.name "DatapadBot"
+          git config user.email "bot@datapad.local"
+          git add data.json
+          git commit -m "🔄 Mise à jour automatique via Datapad"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
