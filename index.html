@@ -1,460 +1,144 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DataPad – Corps Médical OMEGA</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
-<style>
-body {
-  margin: 0;
-  font-family: 'Orbitron', sans-serif;
-  background: #000;
-  color: #00eaff;
-  overflow-x: hidden;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site en maintenance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Orbitron', sans-serif;
+    }
 
-/* Header */
-header {
-  text-align: center;
-  font-size: 2rem;
-  font-weight: bold;
-  text-shadow: 0 0 10px #00eaff, 0 0 20px #007bff;
-  border-bottom: 2px solid #00eaff;
-  padding: 48px 20px 20px;
-  margin: 10px auto;
-  position: relative;
-}
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at top left, #001220, #000814 80%);
+      color: #00eaff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
 
-/* Logo */
-#logo {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  width: 70px;
-  animation: rotateLogoSide 8s linear infinite;
-  filter: drop-shadow(0 0 8px rgba(0,234,255,0.35));
-}
-@keyframes rotateLogoSide {
-  0% { transform: rotateY(0deg); }
-  50% { transform: rotateY(180deg); }
-  100% { transform: rotateY(360deg); }
-}
+    /* Fond animé */
+    .background {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(0,50,100,0.6), rgba(0,0,80,0.8));
+      overflow: hidden;
+      z-index: -2;
+    }
 
-/* Fond animé */
-.background {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: -2;
-  overflow: hidden;
-}
-.background img {
-  position: absolute;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  animation: fadeSlideshow 24s infinite;
-}
-.background img:nth-child(1) { animation-delay: 0s; }
-.background img:nth-child(2) { animation-delay: 8s; }
-.background img:nth-child(3) { animation-delay: 16s; }
-@keyframes fadeSlideshow {
-  0% { opacity: 0; } 10% { opacity: 1; } 30% { opacity: 1; } 40% { opacity: 0; } 100% { opacity: 0; }
-}
+    .grid {
+      position: absolute;
+      top: 0; left: 0;
+      width: 200%; height: 200%;
+      background-image: linear-gradient(rgba(0,234,255,0.08) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0,234,255,0.08) 1px, transparent 1px);
+      background-size: 50px 50px;
+      transform: rotate(1deg);
+      animation: moveGrid 12s linear infinite;
+    }
 
-/* Horloges de mission */
-.mission-timers {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  margin: 16px auto 6px;
-  padding: 0 10px;
-  z-index: 5;
-  position: relative;
-}
-.mission-box {
-  background: rgba(0, 10, 20, 0.6);
-  border: 1px solid rgba(0,234,255,0.18);
-  border-left: 2px solid #00eaff;
-  border-right: 2px solid #00eaff;
-  border-radius: 10px;
-  padding: 10px 18px;
-  width: 220px;
-  box-shadow: 0 0 16px rgba(0,234,255,0.12);
-  text-align: center;
-  backdrop-filter: blur(4px);
-}
-.mission-box h3 {
-  margin: 0 0 6px;
-  font-size: 0.95rem;
-  color: #9ef2ff;
-  letter-spacing: 1px;
-  text-shadow: 0 0 6px rgba(0,234,255,0.12);
-}
-.countdown {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #dffcff;
-  text-shadow: 0 0 10px rgba(0,170,255,0.15);
-}
-.countdown.active {
-  color: #ff5858;
-  text-shadow: 0 0 12px #ff6464, 0 0 22px #ff2b2b;
-  animation: pulseRed 1s infinite ease-in-out;
-}
-@keyframes pulseRed {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
+    @keyframes moveGrid {
+      from { transform: translateY(0) rotate(1deg); }
+      to { transform: translateY(50px) rotate(1deg); }
+    }
 
-/* Boutons */
-.button {
-  display: block;
-  width: 260px;
-  margin: 15px auto;
-  padding: 12px;
-  background: rgba(0, 20, 40, 0.8);
-  border: 2px solid #00eaff;
-  color: #00eaff;
-  text-align: center;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.button:hover {
-  background: #00eaff;
-  color: #000;
-  box-shadow: 0 0 15px #00eaff;
-}
+    /* Scan lumineux */
+    .scan {
+      position: absolute;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: linear-gradient(to bottom, rgba(0,234,255,0) 0%, rgba(0,234,255,0.15) 50%, rgba(0,234,255,0) 100%);
+      animation: scanMove 6s linear infinite;
+      z-index: -1;
+    }
 
-/* Bloc info */
-.info {
-  text-align: center;
-  margin: 30px auto;
-  max-width: 600px;
-  padding: 20px;
-  background: rgba(0, 10, 20, 0.7);
-  border: 1px solid #00eaff;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,234,255,0.3);
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
-.info h2 {
-  color: #00eaff;
-  margin-bottom: 15px;
-  font-size:1.5rem;
-  text-shadow:0 0 8px #00eaff;
-}
+    @keyframes scanMove {
+      0% { top: -100%; }
+      100% { top: 150%; }
+    }
 
-/* Texte défilant */
-.marquee {
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  box-sizing: border-box;
-  border-top: 1px solid #00eaff;
-  border-bottom: 1px solid #00eaff;
-  margin: 10px 0;
-}
-.marquee p {
-  display: inline-block;
-  padding-left: 100%;
-  animation: scrollText 60s linear infinite;
-  font-weight: bold;
-}
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
+    .container {
+      text-align: center;
+      background: rgba(0, 20, 40, 0.7);
+      padding: 60px 80px;
+      border: 2px solid rgba(0,234,255,0.4);
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(0,234,255,0.25);
+      backdrop-filter: blur(6px);
+      animation: fadeIn 1.2s ease-out;
+    }
 
-/* Bouton Discord */
-.discord {
-  display: inline-block;
-  margin: 20px auto 40px;
-  padding: 14px 22px;
-  background: #5865F2;
-  color: #fff;
-  font-weight: bold;
-  text-decoration: none;
-  border-radius: 10px;
-  box-shadow: 0 0 12px rgba(88,101,242,0.8);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.discord:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 18px rgba(88,101,242,1);
-}
+    h1 {
+      font-size: 2.8em;
+      margin-bottom: 20px;
+      text-shadow: 0 0 15px #00eaff, 0 0 30px #007bff;
+      letter-spacing: 1px;
+    }
 
-/* Viewer */
-#viewer {
-  display: none;
-  width: 100%;
-  height: 100vh;
-  position: fixed;
-  top: 0; left: 0;
-  z-index: 10;
-  background: #000;
-}
-#viewer iframe {
-  width:100%; height:100%; border:none;
-}
-#backBtn {
-  position:absolute;
-  top:15px; left:15px;
-  background: rgba(0,20,40,0.9);
-  color:#00eaff;
-  border:2px solid #00eaff;
-  border-radius:6px;
-  padding:8px 14px;
-  cursor:pointer;
-  font-family:'Orbitron',sans-serif;
-  font-weight:bold;
-  z-index:20;
-}
-#backBtn:hover { background:#00eaff; color:#000; }
+    p {
+      font-size: 1.1em;
+      opacity: 0.9;
+      line-height: 1.6;
+      color: #b8f4ff;
+    }
 
-/* Scan effet */
-.scan {
-  position:absolute;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,255,255,0.06);
-  pointer-events:none;
-  z-index:15;
-  opacity:0;
-}
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-/* Responsive */
-@media screen and (max-width: 768px) {
-  header { font-size:1.6rem; padding-top:40px; }
-  .button { width:80%; padding:10px; font-size:1rem; }
-  .info { width:90%; font-size:1rem; }
-  .mission-timers { flex-direction: column; gap:12px; margin-top:90px; }
-  .mission-box { width: 86%; max-width: 320px; }
-}
-</style>
+    footer {
+      position: absolute;
+      bottom: 10px;
+      text-align: center;
+      width: 100%;
+      font-size: 0.9em;
+      color: rgba(0,234,255,0.6);
+    }
+
+    footer span {
+      text-shadow: 0 0 6px rgba(0,234,255,0.3);
+    }
+  </style>
 </head>
 <body>
-
-<div class="background">
-  <img src="https://i.imgur.com/f7PWoZV.jpeg" alt="">
-  <img src="https://i.imgur.com/APBvYRx.jpeg" alt="">
-  <img src="https://i.imgur.com/18aMVXL.jpeg" alt="">
-</div>
-
-<img id="logo" src="https://i.imgur.com/o8Z4h35.png" alt="Logo Flotte">
-
-<header>Datapad – Corps Médical Omega</header>
-
-<!-- Horloges -->
-<div class="mission-timers">
-  <div class="mission-box">
-    <h3>Mission 1 – 18h00</h3>
-    <div class="countdown" id="mission18">--:--:--</div>
+  <div class="background">
+    <div class="grid"></div>
+    <div class="scan"></div>
   </div>
-  <div class="mission-box">
-    <h3>Mission 2 – 21h00</h3>
-    <div class="countdown" id="mission21">--:--:--</div>
+
+  <div class="container">
+    <h1>🚧 Site en maintenance 🚧</h1>
+    <p>Nous travaillons actuellement à l'amélioration du DataPad.<br>
+    Merci de votre patience !</p>
   </div>
-</div>
 
-<!-- Boutons -->
-<div id="docButtons">
-  <div class="button" data-url="https://google.com/">Fonctionnalité en Jeu</div>
-  <div class="button" data-url="https://docs.google.com/spreadsheets/d/18InmloXNjy40ZFQsLcLay0vT1HR999Jjnz8naUmggJw/edit?gid=1198857426#gid=1198857426">Accéder à l'Organigramme</div>
-  <div class="button" data-url="https://google.com/">Documents Formation</div>
-  <div class="button" data-url="https://google.com/">Spécialisation</div>
-  <div class="button" id="majBtn">Mise à Jour</div>
-</div>
-
-<!-- Informations -->
-<div class="info">
-  <h2>Information Importante</h2>
-  <p>
-    Site officiel du Corps Médical de la Flotte Omega – Tous droits réservés.<br><br>
-    Le Datapad est encore en cours de développement.<br><br>
-    Toute suggestion ou bug rencontré est à signaler via le Holocom Discord : <strong>vincent_fr75</strong>
-  </p>
-</div>
-
-<div class="marquee"><p>DataPad en cours de développement - Réalisé par la Direction du Corps Médical !</p></div>
-
-<div style="text-align:center;">
-  <a href="https://discord.gg/wDARBFh8kt" target="_blank" class="discord">💬 Discord Flotte Omega</a>
-</div>
-
-<!-- Viewer -->
-<div id="viewer">
-  <div class="scan" id="scanEffect"></div>
-  <button id="backBtn">⟵ Retour</button>
-  <iframe id="docFrame"></iframe>
-</div>
-
-<script>
-/* ---------------------
-   AUDIO / EFFET SCAN
-   --------------------- */
-let audioCtx = null;
-function ensureAudioContext() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  // resume si en suspended (souvent nécessaire sur mobile)
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(()=>{ /* ignore */ });
-  }
-  return audioCtx;
-}
-
-/**
- * playScanSound()
- * effet court montant (scan) — se lance sur clic (user gesture) pour éviter bloqueurs d'autoplay.
- */
-function playScanSound() {
-  try {
-    const ctx = ensureAudioContext();
-    const now = ctx.currentTime;
-
-    // Oscillateur principal
-    const o = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    o.type = 'sine';
-    o.frequency.setValueAtTime(420, now);
-    // ramp up en 240ms
-    o.frequency.exponentialRampToValueAtTime(1200, now + 0.24);
-
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
-    // décroissance
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
-
-    o.connect(gain);
-    gain.connect(ctx.destination);
-
-    o.start(now);
-    o.stop(now + 0.65);
-
-    // petite couche bruit / "tick" rapide
-    const o2 = ctx.createOscillator();
-    const g2 = ctx.createGain();
-    o2.type = 'triangle';
-    o2.frequency.setValueAtTime(2400, now);
-    g2.gain.setValueAtTime(0.0001, now);
-    g2.gain.linearRampToValueAtTime(0.07, now + 0.01);
-    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
-    o2.connect(g2); g2.connect(ctx.destination);
-    o2.start(now + 0.08);
-    o2.stop(now + 0.2);
-
-  } catch (err) {
-    // si WebAudio indisponible, on ignore proprement
-    console.warn('Impossible de jouer le son (WebAudio non supporté).', err);
-  }
-}
-
-/* ---------------------
-   UI / Viewer
-   --------------------- */
-const docButtons = document.querySelectorAll('#docButtons .button');
-const viewer = document.getElementById('viewer');
-const docFrame = document.getElementById('docFrame');
-const backBtn = document.getElementById('backBtn');
-const scanEffect = document.getElementById('scanEffect');
-
-docButtons.forEach(btn=>{
-  btn.addEventListener('click', (e) => {
-    // Jouer le son de scan (le clic est un gesture, donc OK pour autoplay)
-    playScanSound();
-
-    const url = btn.dataset.url;
-    if (url) {
-      // petit délai pour que le son commence avant l'affichage complet
-      docFrame.src = url;
-      viewer.style.display = 'block';
-      scanEffect.style.opacity = 1;
-      setTimeout(()=> scanEffect.style.opacity = 0, 700);
-    }
-  });
-});
-
-backBtn.addEventListener('click', () => {
-  // petit son retour (plus discret) : réutilise playScanSound mais atténué
-  try {
-    const ctx = ensureAudioContext();
-    const now = ctx.currentTime;
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(600, now);
-    o.frequency.exponentialRampToValueAtTime(420, now + 0.12);
-    g.gain.setValueAtTime(0.0001, now);
-    g.gain.linearRampToValueAtTime(0.07, now + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
-    o.connect(g); g.connect(ctx.destination);
-    o.start(now); o.stop(now + 0.25);
-  } catch(e){ /* ignore */ }
-
-  viewer.style.display = 'none';
-  docFrame.src = '';
-});
-
-/* ---------------------
-   Horloges
-   --------------------- */
-function updateMissionTimers(){
-  const now = new Date();
-  function diff(target){
-    let t = new Date();
-    t.setHours(target,0,0,0);
-    if(t<now) t.setDate(t.getDate()+1);
-    return t-now;
-  }
-  function format(ms){
-    let h=Math.floor(ms/1000/60/60);
-    let m=Math.floor(ms/1000/60)%60;
-    let s=Math.floor(ms/1000)%60;
-    return [h,m,s].map(x=>x.toString().padStart(2,'0')).join(':');
-  }
-  document.getElementById('mission18').textContent=format(diff(18));
-  document.getElementById('mission21').textContent=format(diff(21));
-}
-setInterval(updateMissionTimers,1000);
-updateMissionTimers();
-</script>
-
-</body>
-</html>
+  <footer>
+    <span>© Flotte Médicale OMEGA – Datapad en mise à jour</span>
+  </footer>
 
   <script>
-    // Dissuasion 
+    // Sécurité simple (désactivation clic droit & touches d'inspection)
     document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', function(e){
-      if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'I') || (e.ctrlKey && e.key.toUpperCase() === 'U') || (e.ctrlKey && e.key.toUpperCase() === 'S')){
+    document.addEventListener('keydown', e => {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) ||
+        (e.ctrlKey && ['U','S'].includes(e.key.toUpperCase()))
+      ) {
         e.preventDefault();
-        alert('Accès restreint mon ptit lou ;)');
+        alert('Accès restreint, soldat !');
       }
-    });
-
-    // Lightbox
-    const galleryItems = document.querySelectorAll('.gallery-item img');
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-
-    galleryItems.forEach(img => {
-      img.addEventListener('click', () => {
-        lightboxImg.src = img.src;
-        lightbox.style.display = 'flex';
-      });
-    });
-
-    lightbox.addEventListener('click', () => {
-      lightbox.style.display = 'none';
-      lightboxImg.src = '';
     });
   </script>
 </body>
