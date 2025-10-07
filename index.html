@@ -1,145 +1,147 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Site en maintenance</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Orbitron', sans-serif;
-    }
-
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      background: radial-gradient(circle at top left, #001220, #000814 80%);
-      color: #00eaff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    /* Fond animé */
-    .background {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: linear-gradient(135deg, rgba(0,50,100,0.6), rgba(0,0,80,0.8));
-      overflow: hidden;
-      z-index: -2;
-    }
-
-    .grid {
-      position: absolute;
-      top: 0; left: 0;
-      width: 200%; height: 200%;
-      background-image: linear-gradient(rgba(0,234,255,0.08) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(0,234,255,0.08) 1px, transparent 1px);
-      background-size: 50px 50px;
-      transform: rotate(1deg);
-      animation: moveGrid 12s linear infinite;
-    }
-
-    @keyframes moveGrid {
-      from { transform: translateY(0) rotate(1deg); }
-      to { transform: translateY(50px) rotate(1deg); }
-    }
-
-    /* Scan lumineux */
-    .scan {
-      position: absolute;
-      top: -100%;
-      left: 0;
-      width: 100%;
-      height: 50%;
-      background: linear-gradient(to bottom, rgba(0,234,255,0) 0%, rgba(0,234,255,0.15) 50%, rgba(0,234,255,0) 100%);
-      animation: scanMove 6s linear infinite;
-      z-index: -1;
-    }
-
-    @keyframes scanMove {
-      0% { top: -100%; }
-      100% { top: 150%; }
-    }
-
-    .container {
-      text-align: center;
-      background: rgba(0, 20, 40, 0.7);
-      padding: 60px 80px;
-      border: 2px solid rgba(0,234,255,0.4);
-      border-radius: 15px;
-      box-shadow: 0 0 25px rgba(0,234,255,0.25);
-      backdrop-filter: blur(6px);
-      animation: fadeIn 1.2s ease-out;
-    }
-
-    h1 {
-      font-size: 2.8em;
-      margin-bottom: 20px;
-      text-shadow: 0 0 15px #00eaff, 0 0 30px #007bff;
-      letter-spacing: 1px;
-    }
-
-    p {
-      font-size: 1.1em;
-      opacity: 0.9;
-      line-height: 1.6;
-      color: #b8f4ff;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    footer {
-      position: absolute;
-      bottom: 10px;
-      text-align: center;
-      width: 100%;
-      font-size: 0.9em;
-      color: rgba(0,234,255,0.6);
-    }
-
-    footer span {
-      text-shadow: 0 0 6px rgba(0,234,255,0.3);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maintenance – Datapad OMEGA</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Orbitron',sans-serif;}
+html, body { height:100%; overflow:hidden; background:#000814; color:#00eaff; display:flex; justify-content:center; align-items:center; position:relative;}
+.background { position:absolute; top:0; left:0; width:100%; height:100%; background:radial-gradient(circle at top left, #001220, #000814); overflow:hidden; z-index:-2; }
+.grid { position:absolute; top:0; left:0; width:200%; height:200%; background-image:linear-gradient(rgba(0,234,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0,234,255,0.08) 1px, transparent 1px); background-size:50px 50px; transform:rotate(1deg); animation:moveGrid 12s linear infinite;}
+@keyframes moveGrid { from { transform:translateY(0) rotate(1deg);} to { transform:translateY(50px) rotate(1deg);} }
+.scan { position:absolute; top:-100%; left:0; width:100%; height:50%; background:linear-gradient(to bottom, rgba(0,234,255,0) 0%, rgba(0,234,255,0.15) 50%, rgba(0,234,255,0) 100%); animation:scanMove 6s linear infinite; z-index:-1; }
+@keyframes scanMove {0%{top:-100%;}100%{top:150%;}}
+.container { text-align:center; background: rgba(0,20,40,0.7); padding:40px 60px; border:2px solid rgba(0,234,255,0.4); border-radius:15px; box-shadow:0 0 25px rgba(0,234,255,0.25); backdrop-filter:blur(6px); max-width:900px; width:90%; }
+h1 { font-size:2.5em; margin-bottom:20px; text-shadow:0 0 15px #00eaff,0 0 30px #007bff; letter-spacing:1px;}
+p { font-size:1.1em; opacity:0.9; margin-bottom:20px; }
+table { width:100%; border-collapse:collapse; margin:20px 0; }
+th, td { padding:12px 8px; border:1px solid rgba(0,234,255,0.2); text-align:left; font-size:1rem; }
+th { background: rgba(0,10,20,0.5); }
+td { background: rgba(0,10,20,0.3); }
+.status { font-weight:bold; }
+.assistant { margin-top:30px; text-align:left; background: rgba(0,10,20,0.7); padding:15px; border-radius:12px; max-height:300px; overflow-y:auto; border:1px solid rgba(0,234,255,0.3); }
+.assistant p { margin:6px 0; }
+.assistant .user { color:#fff; font-weight:bold; }
+.assistant .ai { color:#00eaff; font-style:italic; }
+.assistant-input { margin-top:10px; display:flex; gap:8px; }
+.assistant-input input { flex:1; padding:8px 10px; border-radius:6px; border:2px solid #00eaff; background:rgba(0,10,20,0.6); color:#00eaff; font-family:'Orbitron',sans-serif; }
+.assistant-input button { padding:8px 12px; border:none; border-radius:6px; background:#00eaff; color:#000; font-weight:bold; cursor:pointer; transition:0.2s; }
+.assistant-input button:hover { background:#00bcd4; }
+footer { text-align:center; font-size:0.85em; color:rgba(0,234,255,0.5); margin-top:15px; }
+</style>
 </head>
 <body>
-  <div class="background">
-    <div class="grid"></div>
-    <div class="scan"></div>
+<div class="background">
+  <div class="grid"></div>
+  <div class="scan"></div>
+</div>
+
+<div class="container">
+  <h1>🚧 Maintenance – Datapad OMEGA 🚧</h1>
+  <p>Tableau de bord des systèmes</p>
+
+  <table>
+    <thead>
+      <tr><th>Système</th><th>État</th><th>Heure approximative en ligne</th></tr>
+    </thead>
+    <tbody id="systemTable">
+      <tr><td>Base de données</td><td class="status">🟢 En ligne</td><td id="dbTime">///</td></tr>
+      <tr><td>Serveur Web</td><td class="status">🟢 En ligne</td><td id="webTime">///</td></tr>
+      <tr><td>Heure approximative en ligne</td><td class="status">🟠 Maintenance</td><td id="approxTime">21:45</td></tr>
+    </tbody>
+  </table>
+
+  <div class="assistant" id="assistant">
+    <p class="ai">Assistant : Salut ! Pose-moi une question sur le site, le serveur ou le Datapad.</p>
+  </div>
+  <div class="assistant-input">
+    <input type="text" id="userInput" placeholder="Tape ta question...">
+    <button id="sendBtn">Envoyer</button>
   </div>
 
-  <div class="container">
-    <h1>🚧 Site en maintenance 🚧</h1>
-    <p>Nous travaillons actuellement à l'amélioration du DataPad.<br>
-    Merci de votre patience !</p>
-  </div>
+  <footer>© Flotte Médicale OMEGA – Datapad en maintenance</footer>
+</div>
 
-  <footer>
-    <span>© Flotte Médicale OMEGA – Datapad en mise à jour</span>
-  </footer>
+<audio id="beepSound" src="https://freesound.org/data/previews/151/151022_2615114-lq.mp3" autoplay></audio>
 
-  <script>
-    // Sécurité simple (désactivation clic droit & touches d'inspection)
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) ||
-        (e.ctrlKey && ['U','S'].includes(e.key.toUpperCase()))
-      ) {
-        e.preventDefault();
-        alert('Accès restreint, soldat !');
-      }
-    });
-  </script>
+<script>
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key.toUpperCase()))||(e.ctrlKey&&['U','S'].includes(e.key.toUpperCase()))){
+    e.preventDefault(); alert('Accès restreint, soldat ! ⚠️');
+  }
+});
+
+const beep = document.getElementById('beepSound'); beep.volume = 0.25; beep.play();
+
+const assistant = document.getElementById('assistant');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+
+const knowledgeBase = [
+  // Maintenance général
+  {keywords:['quand','accessible','revenir','site'], response:'Le site sera de nouveau accessible dès la fin de la maintenance. Vérifiez régulièrement le tableau ou notre Discord pour plus d’informations.'},
+  {keywords:['serveur','rp','ligne','en ligne'], response:'Le serveur RP est actuellement surveillé. Pour le statut en temps réel, consultez notre Discord ou la liste en jeu.'},
+  {keywords:['raison','maintenance','pourquoi'], response:'La maintenance vise à améliorer la stabilité du serveur et à préparer de nouvelles fonctionnalités RP.'},
+  {keywords:['durée','combien','temps','maintenance'], response:'La durée exacte varie, mais vous pouvez suivre les mises à jour sur le Discord ou le site.'},
+  {keywords:['rejoindre','pendant','maintenance'], response:'Pendant la maintenance, il est recommandé de consulter le Discord. Certains serveurs peuvent rester accessibles, vérifiez la liste GMod en jeu.'},
+  {keywords:['actif','temps réel','en direct'], response:'Vous pouvez vérifier l’activité du serveur en temps réel via le Discord ou directement dans la liste des serveurs GMod.'},
+  {keywords:['fonctionnalité','nouveau','update'], response:'Le site et le serveur recevront de nouvelles fonctionnalités après la maintenance. Plus d’infos sur le Discord.'},
+  // RP Universe
+  {keywords:['contexte','lore','serveur rp'], response:'Le serveur RP se déroule durant la phase II de la guerre des clones (Star Wars). Les joueurs incarnent différentes factions et participent à des missions et événements immersifs.'},
+  {keywords:['faction','équipe','disponible'], response:'Les factions et équipes disponibles sont détaillées sur notre Discord dans les salons d’informations.'},
+  {keywords:['événement','nouveau'], response:'De nouveaux événements RP seront annoncés sur le Discord après la maintenance.'},
+  {keywords:['proposer','idée','rp'], response:'Vous pouvez proposer vos idées RP directement sur le Discord, dans les salons dédiés à la communauté.'},
+  // Technique
+  {keywords:['page','affiche','bug'], response:'Si certaines pages ne s’affichent pas correctement, vérifiez votre navigateur ou réessayez plus tard.'},
+  {keywords:['sauvegarde','sécurisé'], response:'Les sauvegardes des joueurs sont sécurisées et gérées sur notre base de données protégée.'},
+  {keywords:['navigateur','appareil','compatible'], response:'Le site est compatible avec la majorité des navigateurs modernes (Chrome, Edge, Firefox, Safari) et appareils.'},
+  {keywords:['performance','update','serveur'], response:'Des mises à jour des performances du serveur sont prévues après la maintenance pour améliorer la stabilité et la vitesse.'},
+  // Communauté
+  {keywords:['discord','rejoindre','communauté'], response:'Pour rejoindre la communauté, consultez notre Discord officiel via le site principal.'},
+  {keywords:['admin','contact','contacter'], response:'Les admins peuvent être contactés via le Discord pendant la maintenance.'},
+  {keywords:['règle','regle','serveur'], response:'Toutes les règles du serveur sont disponibles sur le Discord avant de rejoindre le serveur RP.'},
+  {keywords:['classement','statistique','joueur'], response:'Les classements et statistiques sont disponibles sur le Discord.'},
+  {keywords:['problème','bug','signaler'], response:'Pour signaler un problème ou un bug, utilisez le Discord ou le ticket en jeu si disponible.'},
+  // IA / support
+  {keywords:['ia','assistant','fonctionne'], response:'L’IA du Datapad répond à vos questions sur le site et le serveur RP en utilisant une base de données locale. Pour des informations plus précises, le Discord reste la référence.'},
+  {keywords:['mission','événement','lore'], response:'Pour poser des questions sur les missions ou le lore, le Discord et les salons RP sont la source officielle.'},
+  {keywords:['événement','prochain','mission'], response:'Pour connaître les événements ou missions à venir, consultez le Discord ou la liste des événements en jeu.'},
+];
+
+function aiResponse(msg){
+  msg = msg.toLowerCase();
+  for(let item of knowledgeBase){
+    for(let kw of item.keywords){
+      if(msg.includes(kw)) return item.response;
+    }
+  }
+  const genericResponses = [
+    'Intéressant... Peux-tu reformuler ?',
+    'Je ne suis pas sûr de comprendre, essaie avec d’autres mots.',
+    'Je ne connais pas encore la réponse à cela.',
+    'Essaie une autre question sur le Datapad ou le serveur RP.'
+  ];
+  return genericResponses[Math.floor(Math.random()*genericResponses.length)];
+}
+
+function addMessage(sender, text){
+  assistant.innerHTML += `<p class="${sender}">${sender==='user'?'Vous':'Assistant'} : ${text}</p>`;
+  assistant.scrollTop = assistant.scrollHeight;
+}
+
+sendBtn.addEventListener('click', ()=>{
+  const msg = userInput.value.trim();
+  if(!msg) return;
+  addMessage('user', msg);
+  const response = aiResponse(msg);
+  setTimeout(()=>addMessage('ai', response), 400);
+  userInput.value='';
+});
+
+userInput.addEventListener('keypress', e=>{ if(e.key==='Enter') sendBtn.click(); });
+</script>
 </body>
 </html>
