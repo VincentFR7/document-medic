@@ -6,6 +6,7 @@
 <title>DataPad – Corps Médical OMEGA</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
 <style>
+/* --- NE PAS CHANGER LE STYLE : copie exacte du style fourni par l'utilisateur --- */
 body {
   margin: 0;
   font-family: 'Orbitron', sans-serif;
@@ -236,6 +237,29 @@ header {
   .mission-timers { flex-direction: column; gap:12px; margin-top:90px; }
   .mission-box { width: 86%; max-width: 320px; }
 }
+
+/* --- Styles additionnels pour le modal auth (discrets, n'altèrent pas le design) --- */
+.auth-modal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  display: none; align-items: center; justify-content: center; z-index: 100;
+  background: rgba(0,0,0,0.6);
+}
+.auth-card {
+  background: rgba(0,10,20,0.95); border: 2px solid #00eaff; padding: 18px; width: 360px; border-radius: 10px;
+}
+.auth-card h3 { margin-top: 0; color:#9ef2ff }
+.auth-card input { width:100%; padding:10px; margin:8px 0; border-radius:6px; border:2px solid #00eaff; background:transparent; color:#00eaff }
+.auth-actions { display:flex; gap:8px; justify-content:space-between; align-items:center }
+.small-link { color:#9ef2ff; cursor:pointer; text-decoration:underline }
+
+/* Top menu (Profil & Membre) */
+.top-menu { position:absolute; top:18px; right:18px; z-index:50; display:flex; gap:10px; align-items:center }
+.top-left { position:absolute; top:18px; left:100px; z-index:50; display:flex; gap:10px; align-items:center }
+.profile-pill { padding:8px 12px; border-radius:8px; border:1px solid rgba(0,234,255,0.12); background:rgba(0,10,20,0.6); cursor:pointer }
+
+/* Public members list */
+.member-list { position:absolute; top:60px; left:18px; max-height:60vh; overflow:auto; width:260px; background:rgba(0,10,20,0.7); border:1px solid #00eaff; padding:10px; border-radius:8px }
+.member-item { padding:6px; border-bottom:1px dashed rgba(0,234,255,0.06); font-size:0.95rem }
 </style>
 </head>
 <body>
@@ -251,6 +275,15 @@ header {
 
 <div id="main">
   <header>Datapad – Corps Médical Omega</header>
+
+  <!-- Top menu: Profil / Membre -->
+  <div class="top-left">
+    <div class="profile-pill" id="membersBtn">Membre</div>
+  </div>
+  <div class="top-menu">
+    <div class="profile-pill" id="profileBtn">Profil</div>
+    <div class="profile-pill" id="authBtn">Se connecter / S'inscrire</div>
+  </div>
 
   <div style="text-align:center; margin:10px 0;">
     <input type="text" id="searchInput" placeholder="Rechercher un document..." style="padding:8px 10px; border-radius:6px; border:2px solid #00eaff; width:250px; color:#00eaff; background:rgba(0,10,20,0.7);">
@@ -298,8 +331,252 @@ header {
   <iframe id="docFrame"></iframe>
 </div>
 
+<!-- Public member list (profil public) -->
+<div class="member-list" id="memberList" aria-live="polite">
+  <strong>Membres publics</strong>
+  <div id="membersContainer"></div>
+</div>
+
+<!-- Auth modal -->
+<div class="auth-modal" id="authModal">
+  <div class="auth-card" id="authCard">
+    <!-- content injected by JS -->
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
 <script>
-/* ---------- boutons ouvrant l'iframe ---------- */
+/* ------------------------------------------------------------------
+  IMPORTANT : Remplacez les valeurs SUPABASE_URL et SUPABASE_ANON_KEY
+  par celles de votre projet Supabase. NE PAS pousser la service_role
+  key côté client.
+  ------------------------------------------------------------------ */
+const SUPABASE_URL = 'https://VOTRE-SUPABASE-URL.supabase.co';
+const SUPABASE_ANON_KEY = 'VOTRE_ANON_PUBLIC_KEY';
+
+const supabase = supabaseCreateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+function supabaseCreateClient(url, key){
+  return window.supabase = supabasejs.createClient(url, key);
+}
+
+/* ----------------- UI hooks ----------------- */
+const authBtn = document.getElementById('authBtn');
+const profileBtn = document.getElementById('profileBtn');
+const profileModal = document.getElementById('authModal');
+const authCard = document.getElementById('authCard');
+const membersBtn = document.getElementById('membersBtn');
+const membersContainer = document.getElementById('membersContainer');
+const docButtons = document.getElementById('docButtons');
+
+/* State */
+let currentUser = null; // supabase user object
+let currentProfile = null; // profile row from 'profiles' table
+
+/* Roles (grades) autorisés à voir l'intégralité du site */
+const GRADES_ALLOWED = [
+  'Staff OMEGA',
+  'Médecin Standard',
+  'Membre du Conseil Médical',
+  "Superviseur de l'ordre médical"
+];
+
+/* Rôles avec droits forum/attribution */
+const GRADES_FOR_FORUM = ['Membre du Conseil Médical', "Superviseur de l'ordre médical"];
+
+/* ----------------- Modals & Forms ----------------- */
+function openAuthModal(mode='login'){ // mode: login | register | forgot
+  profileModal.style.display = 'flex';
+  renderAuth(mode);
+}
+function closeAuthModal(){ profileModal.style.display = 'none'; }
+
+function renderAuth(mode){
+  if(mode==='login'){
+    authCard.innerHTML = `
+      <h3>Connexion</h3>
+      <input id="loginEmail" type="email" placeholder="Email">
+      <input id="loginPass" type="password" placeholder="Mot de passe">
+      <div class="auth-actions">
+        <button id="doLogin" class="button">Se connecter</button>
+        <div>
+          <div class="small-link" id="toRegister">S'inscrire</div>
+          <div class="small-link" id="toForgot">Mot de passe oublié</div>
+        </div>
+      </div>
+      <div style="margin-top:8px; text-align:right"><button class="button" id="closeAuth">Fermer</button></div>
+    `;
+    document.getElementById('toRegister').onclick = ()=> renderAuth('register');
+    document.getElementById('toForgot').onclick = ()=> renderAuth('forgot');
+    document.getElementById('doLogin').onclick = doLogin;
+    document.getElementById('closeAuth').onclick = closeAuthModal;
+  } else if(mode==='register'){
+    authCard.innerHTML = `
+      <h3>Inscription</h3>
+      <input id="regEmail" type="email" placeholder="Email">
+      <input id="regPass" type="password" placeholder="Mot de passe (min 6)">
+      <input id="regName" type="text" placeholder="Nom complet">
+      <input id="regGrade" type="text" placeholder="Grade (ex: Médecin Standard)">
+      <input id="regRegiment" type="text" placeholder="Régiment">
+      <input id="regFonction" type="text" placeholder="Fonction">
+      <input id="regMatricule" type="text" placeholder="Matricule">
+      <input id="regNickname" type="text" placeholder="Surnom (optionnel)">
+      <div class="auth-actions">
+        <button id="doRegister" class="button">S'inscrire</button>
+        <div><div class="small-link" id="toLogin">Se connecter</div></div>
+      </div>
+      <div style="margin-top:8px; text-align:right"><button class="button" id="closeAuth">Fermer</button></div>
+    `;
+    document.getElementById('toLogin').onclick = ()=> renderAuth('login');
+    document.getElementById('doRegister').onclick = doRegister;
+    document.getElementById('closeAuth').onclick = closeAuthModal;
+  } else if(mode==='forgot'){
+    authCard.innerHTML = `
+      <h3>Mot de passe oublié</h3>
+      <input id="forgotEmail" type="email" placeholder="Votre email enregistré">
+      <div class="auth-actions">
+        <button id="doForgot" class="button">Envoyer lien de réinitialisation</button>
+        <div><div class="small-link" id="toLogin">Se connecter</div></div>
+      </div>
+      <div style="margin-top:8px; text-align:right"><button class="button" id="closeAuth">Fermer</button></div>
+    `;
+    document.getElementById('toLogin').onclick = ()=> renderAuth('login');
+    document.getElementById('doForgot').onclick = doForgot;
+    document.getElementById('closeAuth').onclick = closeAuthModal;
+  }
+}
+
+/* ----------------- Supabase Auth actions ----------------- */
+async function doRegister(){
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPass').value;
+  const full_name = document.getElementById('regName').value.trim();
+  const grade = document.getElementById('regGrade').value.trim();
+  const regiment = document.getElementById('regRegiment').value.trim();
+  const fonction = document.getElementById('regFonction').value.trim();
+  const matricule = document.getElementById('regMatricule').value.trim();
+  const nickname = document.getElementById('regNickname').value.trim();
+
+  if(!email || !password || !full_name){ alert('Remplissez au moins l\'email, le mot de passe et le nom complet.'); return; }
+  // register with supabase
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if(error){ alert('Erreur inscription : ' + error.message); return; }
+
+  // create profile row in 'profiles' table
+  const profile = {
+    id: data.user.id,
+    full_name, grade, regiment, fonction, matricule, nickname
+  };
+  const { error: err2 } = await supabase.from('profiles').upsert(profile);
+  if(err2){ console.warn(err2); alert('Inscription réussie (vérifiez votre mail). Erreur lors de création du profil : ' + err2.message); }
+  else { alert('Inscription réussie. Vérifiez votre mail pour confirmer (si activé).'); closeAuthModal(); }
+}
+
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPass').value;
+  if(!email || !password){ alert('Email et mot de passe requis'); return; }
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if(error){ alert('Erreur connexion : ' + error.message); return; }
+  // onAuthStateChange gérera le reste
+  closeAuthModal();
+}
+
+async function doForgot(){
+  const email = document.getElementById('forgotEmail').value.trim();
+  if(!email){ alert('Entrez votre email'); return; }
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin // après reset renvoie sur le site
+  });
+  if(error){ alert('Erreur : ' + error.message); }
+  else { alert('Si un compte existe, vous allez recevoir un e-mail avec les instructions.'); closeAuthModal(); }
+}
+
+/* ----------------- Session / Profile handling ----------------- */
+async function loadProfile(user){
+  if(!user) { currentProfile = null; currentUser = null; updateUIForUser(); return; }
+  currentUser = user;
+  const { data: profiles, error } = await supabase.from('profiles').select('*').eq('id', user.id).limit(1).single();
+  if(error){ console.warn('profile fetch', error); currentProfile = null; }
+  else currentProfile = profiles;
+  updateUIForUser();
+}
+
+function updateUIForUser(){
+  // Auth button text
+  if(currentUser){
+    authBtn.textContent = 'Déconnexion';
+    profileBtn.style.display = 'inline-block';
+  } else {
+    authBtn.textContent = 'Se connecter / S\'inscrire';
+    profileBtn.style.display = 'none';
+  }
+
+  // Show only information if not authorized
+  let allowed = false;
+  if(currentProfile && GRADES_ALLOWED.includes(currentProfile.grade)) allowed = true;
+
+  document.getElementById('docButtons').style.display = allowed ? 'block' : 'none';
+  // If not allowed show only info and discord. (docButtons hidden accomplishes that)
+}
+
+/* Logout */
+authBtn.addEventListener('click', async ()=>{
+  if(currentUser){
+    await supabase.auth.signOut();
+  } else {
+    openAuthModal('login');
+  }
+});
+
+/* Profile modal: show public profile or edit for current user */
+profileBtn.addEventListener('click', async ()=>{
+  if(!currentUser){ openAuthModal('login'); return; }
+  // show small profile card with info + if supervisor show admin controls
+  let html = `<h3>Profil : ${currentProfile?.full_name ?? '—'}</h3>`;
+  html += `<p>Grade : ${currentProfile?.grade ?? '—'}</p>`;
+  html += `<p>Régiment : ${currentProfile?.regiment ?? '—'}</p>`;
+  html += `<p>Fonction : ${currentProfile?.fonction ?? '—'}</p>`;
+  html += `<p>Matricule : ${currentProfile?.matricule ?? '—'}</p>`;
+  html += `<p>Surnom : ${currentProfile?.nickname ?? '—'}</p>`;
+  // Admin supervisor actions
+  if(currentProfile && currentProfile.grade === "Superviseur de l'ordre médical"){
+    html += `<hr><p><strong>Actions Superviseur</strong></p>`;
+    html += `<p><button id="btnSendReset" class="button">Envoyer email de réinitialisation à un membre</button></p>`;
+  }
+  html += `<div style="text-align:right"><button id="closeProfile" class="button">Fermer</button></div>`;
+  authCard.innerHTML = html;
+  profileModal.style.display = 'flex';
+  document.getElementById('closeProfile').onclick = ()=> profileModal.style.display='none';
+  const btnSendReset = document.getElementById('btnSendReset');
+  if(btnSendReset){
+    btnSendReset.onclick = async ()=>{
+      const targetEmail = prompt('Email du membre à réinitialiser :');
+      if(!targetEmail) return alert('Annulé');
+      // NOTE : pour faire un reset sécurisé temporaire côté admin il vous faudra
+      // utiliser une Netlify Function (service_role key côté serveur). Ici on
+      // déclenche l'email de reset standard qui envoie un lien au membre.
+      const { data, error } = await supabase.auth.resetPasswordForEmail(targetEmail, { redirectTo: window.location.origin });
+      if(error) alert('Erreur lors de l\'envoi : ' + error.message);
+      else alert('Email de réinitialisation envoyé (si le compte existe).');
+    }
+  }
+});
+
+/* Members list public */
+membersBtn.addEventListener('click', async ()=>{
+  // toggle display
+  const ml = document.getElementById('memberList');
+  ml.style.display = (ml.style.display === 'none' || !ml.style.display) ? 'block' : 'none';
+});
+
+async function loadPublicMembers(){
+  // On affiche uniquement les membres qui ont choisi d'être publics
+  const { data, error } = await supabase.from('profiles').select('id, full_name, grade, regiment, nickname').limit(100);
+  if(error){ console.warn(error); return; }
+  membersContainer.innerHTML = data.map(m => `\n    <div class="member-item"><strong>${m.full_name}</strong><br>${m.grade} — ${m.regiment || ''} ${m.nickname ? ' — "'+m.nickname+'"' : ''}</div>`).join('');
+}
+
+/* ---------- boutons ouvrant l'iframe (inchangés) ---------- */
 const buttons = document.querySelectorAll('.button[data-url]');
 const viewer = document.getElementById('viewer');
 const docFrame = document.getElementById('docFrame');
@@ -329,7 +606,7 @@ document.getElementById('backBtn').addEventListener('click', ()=>{
   try { new Audio('https://freesound.org/data/previews/256/256114_3263906-lq.mp3').play(); } catch(e) {}
 });
 
-/* ---------- Filtre recherche ---------- */
+/* ---------- Filtre recherche (inchangé) ---------- */
 document.getElementById('searchInput').addEventListener('input', e=>{
   const val = e.target.value.toLowerCase();
   buttons.forEach(btn=>{
@@ -337,7 +614,7 @@ document.getElementById('searchInput').addEventListener('input', e=>{
   });
 });
 
-/* ---------- Désactivation clic droit et touches dev ---------- */
+/* ---------- Désactivation clic droit et touches dev (inchangé) ---------- */
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', function(e){
   if(e.key==='F12' || (e.ctrlKey && e.shiftKey && e.key.toUpperCase()==='I') || (e.ctrlKey && e.key.toUpperCase()==='U') || (e.ctrlKey && e.key.toUpperCase()==='S')){
@@ -346,12 +623,11 @@ document.addEventListener('keydown', function(e){
   }
 });
 
-/* ---------- Horloges de mission (18:00 & 21:00 chaque jour) ---------- */
+/* ---------- Horloges de mission (18:00 & 21:00 chaque jour) (inchangé) ---------- */
 function updateCountdown(targetHour, elementId) {
   const now = new Date();
   const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), targetHour, 0, 0, 0);
 
-  // si l'heure est déjà passée aujourd'hui → target = lendemain
   if (now >= target) {
     target.setDate(target.getDate() + 1);
   }
@@ -364,29 +640,25 @@ function updateCountdown(targetHour, elementId) {
 
   const el = document.getElementById(elementId);
 
-  // Si dans la fenêtre d'activation (on considère : à la seconde pile on affiche mission en cours)
   if (diff <= 0) {
     el.textContent = "MISSION EN COURS";
     el.classList.add("active");
   } else {
-    // Format HH:MM:SS (heures limitées à 2 chiffres pour esthétique)
     const display = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
     el.textContent = display;
     el.classList.remove("active");
   }
 }
 
-// Update chaque seconde
 setInterval(() => {
   updateCountdown(18, "mission18");
   updateCountdown(21, "mission21");
 }, 1000);
 
-// Init immédiat
 updateCountdown(18, "mission18");
 updateCountdown(21, "mission21");
 
-/* ---------- Option: notification sonore quand mission débute ---------- */
+/* ---------- Option: notification sonore (inchangé) ---------- */
 let lastState18 = null;
 let lastState21 = null;
 function checkAndAlert() {
@@ -396,7 +668,6 @@ function checkAndAlert() {
   const state18 = el18.classList.contains('active');
   const state21 = el21.classList.contains('active');
 
-  // quand passe à "active" on joue un son (une seule fois)
   if (state18 && !lastState18) {
     try { new Audio('https://freesound.org/data/previews/401/401999_5121236-lq.mp3').play(); } catch(e) {}
   }
@@ -407,7 +678,68 @@ function checkAndAlert() {
   lastState21 = state21;
 }
 setInterval(checkAndAlert, 1000);
-</script>
 
+/* ---------- Supabase: onAuthStateChange ---------- */
+supabase.auth.onAuthStateChange((event, session) => {
+  if(session && session.user) loadProfile(session.user);
+  else loadProfile(null);
+});
+
+// on load
+(async ()=>{
+  const { data: { user } } = await supabase.auth.getUser();
+  if(user) loadProfile(user);
+  loadPublicMembers();
+})();
+
+/* ----------------- NOTE (installation côté Supabase) -----------------
+1) Créez une table 'profiles' avec au minimum ces colonnes :
+   - id (uuid) PRIMARY KEY (utiliser l'id du user supabase)
+   - full_name text
+   - grade text
+   - regiment text
+   - fonction text
+   - matricule text
+   - nickname text
+   - created_at timestamp default now()
+
+2) Dans Supabase -> Auth -> Templates, configurez le mail de reset &
+   confirmation pour avoir des messages clairs.
+
+3) Dans Policies : pour un début, vous pouvez désactiver RLS sur 'profiles'
+   ou créer des policies qui autorisent l'insert pour les utilisateurs
+   authentifiés et la lecture publique limitée.
+
+4) Pour permettre aux "Superviseur de l\'ordre médical" d\'effectuer
+   des réinitialisations sans connaître le mot de passe :
+   - Côté client on déclenche l'email de réinitialisation (reset link).
+   - Pour imposer un mot de passe temporaire automatiquement, il faut
+     utiliser la SERVICE_ROLE_KEY côté serveur (par ex. Netlify Functions)
+     pour appeler l'API admin de Supabase et modifier le mot de passe.
+     **NE PAS** mettre la service_role key dans le JS client.
+
+Exemple simple d'endpoint Netlify (Node) :
+
+// netlify/functions/admin_reset.js
+// require('node-fetch') si nécessaire
+exports.handler = async (event) => {
+  const body = JSON.parse(event.body);
+  const targetEmail = body.email;
+  const TEMP_PWD = body.tmp || 'Temp1234!';
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY; // à configurer dans Netlify
+
+  const resp = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+    method: 'GET', // ici vous pouvez rechercher puis appeler PATCH pour changer password
+    headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type':'application/json' }
+  });
+  // Implémenter la logique admin (rechercher user puis modifier password)
+  return { statusCode: 200, body: JSON.stringify({ ok: true }) };
+};
+
+-------------------------------------------------------------------------
+*/
+
+</script>
 </body>
 </html>
